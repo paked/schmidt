@@ -2,7 +2,15 @@ server {
 	listen 80;
 	server_name ascii.schmidt.harrison.tech;
 
-	return 301 https://$server_name$request_uri;
+    location ~ /.well-known {
+        allow all;
+        root /var/www/html;
+		try_files $uri $uri/ =404;
+    }
+
+    location ~ ^/.well-known {
+        return 301 https://$server_name$request_uri;
+    }
 }
 
 server {
@@ -16,11 +24,11 @@ server {
 	include snippets/ssl-params.conf;
 
 	location / {
-		proxy_pass http://localhost:4567;
+		proxy_pass http://localhost:8765;
 	}
 
 	# Otherwise gollum makes you write a dumb 'Home' file
-	location ~ ^/$ {
-		return 301 https://$server_name/README;
-	}
+	# location ~ ^/$ {
+	#	return 301 https://$server_name/README;
+	# }
 }
